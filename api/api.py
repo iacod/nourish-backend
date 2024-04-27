@@ -45,7 +45,6 @@ def register(request: HttpRequest, data: Register):
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
-    user.is_active = False
     login(request, user)
     return JsonResponse(data.dict(), status=200)
   else:
@@ -72,7 +71,7 @@ def get_donation_amount(request: HttpRequest):
 
 @api.get("/user")
 def get_user(request: HttpRequest):
-  if request.user.is_authenticated:
+  if not request.user.is_authenticated:
     return JsonResponse(model_to_dict(request.user), status=200)
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
