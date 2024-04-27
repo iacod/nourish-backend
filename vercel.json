@@ -4,11 +4,10 @@
       "use": "@vercel/python",
       "config": { "maxLambdaSize": "15mb" }
   }],
-  "routes": [{
+  "routes": [
+    {
       "src": "/(.*)",
-      "dest": "main/wsgi.py",
-      "headers": {
-        "Access-Control-Allow-Origin": "*"
-      }
-  }],
+      "dest": "main/wsgi.py"
+    }
+  ]
 }
