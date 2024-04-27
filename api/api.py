@@ -4,6 +4,7 @@ from ninja import NinjaAPI, Schema
 from django.http import HttpRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+import orjson
 
 api = NinjaAPI()
 
@@ -35,14 +36,14 @@ def register(request: HttpRequest, data: Register):
   user.set_password(data.password)
   user.save()
 
-  return JsonResponse(data, status=200)
+  return JsonResponse(orjson.dumps(data), status=200)
 
 @api.post("/login")
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
     login(request, user)
-    return JsonResponse(data, status=200)
+    return JsonResponse(orjson.dumps(data), status=200)
   else:
     return JsonResponse({"message": "Invalid username or password"}, status=406)
 
