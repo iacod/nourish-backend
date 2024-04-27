@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
