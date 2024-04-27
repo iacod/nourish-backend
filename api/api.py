@@ -4,8 +4,9 @@ from ninja import NinjaAPI, Schema
 from django.http import HttpRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from ninja.security import django_auth
 
-api = NinjaAPI()
+api = NinjaAPI(csrf=True)
 
 class Register(Schema):
   username: str
@@ -47,20 +48,18 @@ def log_in(request: HttpRequest, data: Login):
     return JsonResponse({"message": "Invalid username or password"}, status=406)
 
 @api.post("/donate/{amount}")
-def donate(request: HttpRequest, amount: int):
-  if request.user.is_authenticated:
-    request.user.volunteer.pounds += amount
-    request.user.volunteer.save()
-    return JsonResponse({"amount_donated": amount}, status=200)
-  else:
-    return JsonResponse({"message": "You must be logged in"}, status=401)
+def donate(request: HttpRequest, amount: int, auth=django_auth):
+  request.user.volunteer.pounds += amount
+  request.user.volunteer.save()
+  return JsonResponse({"amount_donated": amount}, status=200)
 
 @api.get("/donate")
-def get_donation_amount(request: HttpRequest):
-  if request.user.is_authenticated:
-    if not hasattr(request.user, "volunteer"):
-      volunteer = Volunteer(user=request.user, pounds=0)
-      volunteer.save()
-    return JsonResponse({"amount_donated": request.user.volunteer.pounds}, status=200)
-  else:
-    return JsonResponse({"message": "You must be logged in"}, status=401)
+def get_donation_amount(request: HttpRequest, auth=django_auth):
+  if not hasattr(request.user, "volunteer"):
+    volunteer = Volunteer(user=request.user, pounds=0)
+    volunteer.save()
+  return JsonResponse({"amount_donated": request.user.volunteer.pounds}, status=200)
+
+@api.get("/user")
+def get_user(request: HttpRequest, auth=django_auth):
+  return JsonResponse(request.user.dict(), status=200)
