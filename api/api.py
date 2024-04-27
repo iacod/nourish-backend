@@ -76,4 +76,4 @@ def get_user(request: HttpRequest):
   if request.user.is_authenticated:
     return JsonResponse(model_to_dict(request.user), status=200)
   else:
-    return JsonResponse({"message": "Not logged in"}, status=401)
+    return JsonResponse({"message": "Not logged in"}, status=403)
