@@ -71,7 +71,7 @@ def get_donation_amount(request: HttpRequest):
 
 @api.get("/user")
 def get_user(request: HttpRequest):
-  if not request.user.is_authenticated:
+  if request.user.is_authenticated:
     return JsonResponse(model_to_dict(request.user), status=200)
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
