@@ -6,8 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from ninja.security import django_auth
 from django.forms.models import model_to_dict
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 
-api = NinjaAPI()
+api = NinjaAPI(csrf=True)
 
 class Register(Schema):
   username: str
@@ -21,6 +22,8 @@ class Login(Schema):
   password: str
 
 @api.post("/register")
+@ensure_csrf_cookie
+@csrf_exempt
 def register(request: HttpRequest, data: Register):
   user = User.objects.filter(username=data.username, email=data.email)
 
@@ -40,6 +43,8 @@ def register(request: HttpRequest, data: Register):
   return JsonResponse(data.dict(), status=200)
 
 @api.post("/login")
+@ensure_csrf_cookie
+@csrf_exempt
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
