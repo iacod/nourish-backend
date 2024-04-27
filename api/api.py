@@ -1,7 +1,7 @@
 from pydantic.config import JsonDict
 from api.models import Volunteer
 from ninja import NinjaAPI, Schema
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from ninja.security import django_auth
@@ -22,13 +22,14 @@ class Login(Schema):
   password: str
 
 @api.post("/register")
-@ensure_csrf_cookie
 @csrf_exempt
 def register(request: HttpRequest, data: Register):
   user = User.objects.filter(username=data.username, email=data.email)
+  response = HttpResponse()
 
   if user.exists():
-    return JsonResponse({"message": "User already exists"}, status=409)
+    response.write("Fail")
+    return response
 
   user = User.objects.create(
     username=data.username,
@@ -40,18 +41,23 @@ def register(request: HttpRequest, data: Register):
   user.set_password(data.password)
   user.save()
 
-  return JsonResponse(data.dict(), status=200)
+  response.write("Sucess")
+  return response
 
 @api.post("/login")
 @ensure_csrf_cookie
 @csrf_exempt
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
+  response = HttpResponse()
+  
   if user is not None:
     login(request, user)
-    return JsonResponse(data.dict(), status=200)
+    response.write("Sucess")
   else:
-    return JsonResponse({"message": "Invalid username or password"}, status=406)
+    response.write("Fail")
+    
+  return response
 
 @api.post("/donate/{amount}", auth=django_auth)
 def donate(request: HttpRequest, amount: int):
