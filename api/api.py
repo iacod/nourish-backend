@@ -47,6 +47,8 @@ def log_in(request: HttpRequest, data: Login):
     user = authenticate(request, username=data.username, password=data.password)
     if user is not None:
       login(request, user)
+      request.session['username'] = data.username
+      request.session.save()
       return JsonResponse(data.dict(), status=200)
     else:
       return JsonResponse({"message": "Invalid username or password"}, status=406)
