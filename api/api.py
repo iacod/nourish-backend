@@ -1,6 +1,6 @@
 from pydantic.config import JsonDict
 from api.models import Volunteer
-from ninja import NinjaAPI, Schema
+from ninja import NinjaAPI, Schema, router
 from django.http import HttpRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, update_session_auth_hash
@@ -8,8 +8,9 @@ from ninja.security import django_auth
 from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
+from ninja_jwt.authentication import JWTAuth
 
-api = NinjaAPI()
+router = router('')
 
 class Register(Schema):
   username: str
@@ -51,7 +52,7 @@ def log_in(request: HttpRequest, data: Login):
     else:
       return JsonResponse({"message": "Invalid username or password"}, status=406)
 
-@api.post("/donate/{amount}")
+@router.post('/donate/{amount}', auth=JWTAuth())
 def donate(request: HttpRequest, amount: int):
   if request.user.is_authenticated:
     request.user.volunteer.pounds += amount
@@ -60,7 +61,7 @@ def donate(request: HttpRequest, amount: int):
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
 
-@api.get("/donate")
+@router.get('/donate', auth=JWTAuth())
 def get_donation_amount(request: HttpRequest):
   if request.user.is_authenticated:
     if not hasattr(request.user, "volunteer"):
@@ -70,7 +71,7 @@ def get_donation_amount(request: HttpRequest):
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
 
-@api.get("/user")
+@router.get('/user', auth=JWTAuth())
 def get_user(request: HttpRequest):
   if request.user.is_authenticated:
     return JsonResponse(model_to_dict(request.user), status=200)
