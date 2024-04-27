@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login
 from ninja.security import django_auth
 from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.contrib.auth.decorators import login_required
 
 api = NinjaAPI()
 
@@ -22,7 +23,6 @@ class Login(Schema):
   password: str
 
 @api.post("/register")
-@csrf_exempt
 def register(request: HttpRequest, data: Register):
   user = User.objects.filter(username=data.username, email=data.email)
 
@@ -42,8 +42,6 @@ def register(request: HttpRequest, data: Register):
   return JsonResponse(data.dict(), status=200)
 
 @api.post("/login")
-@ensure_csrf_cookie
-@csrf_exempt
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
@@ -52,6 +50,7 @@ def log_in(request: HttpRequest, data: Login):
   else:
     return JsonResponse({"message": "Invalid username or password"}, status=406)
 
+@login_required(login_url='/login')
 @api.post("/donate/{amount}")
 def donate(request: HttpRequest, amount: int):
   if request.user.is_authenticated:
@@ -61,6 +60,7 @@ def donate(request: HttpRequest, amount: int):
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
 
+@login_required(login_url='/login')
 @api.get("/donate")
 def get_donation_amount(request: HttpRequest):
   if request.user.is_authenticated:
@@ -71,6 +71,7 @@ def get_donation_amount(request: HttpRequest):
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
 
+@login_required(login_url='/login')
 @api.get("/user")
 def get_user(request: HttpRequest):
   if request.user.is_authenticated:
