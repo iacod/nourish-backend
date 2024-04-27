@@ -26,12 +26,12 @@ def register(request: HttpRequest, data: Register):
 
   user = User.objects.create(
     username=data.username,
-    password=data.password,
     first_name=data.first_name,
     last_name=data.last_name,
     email=data.email,
   )
 
+  user.set_password(data.password)
   user.save()
 
   return data
