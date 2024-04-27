@@ -1,3 +1,4 @@
+from api.models import Volunteer
 from ninja import NinjaAPI, Schema
 from django.http import HttpRequest
 from django.contrib.auth.models import User
@@ -56,7 +57,9 @@ def donate(request: HttpRequest, amount: int):
 @api.get("/donate")
 def get_donation_amount(request: HttpRequest):
   if request.user.is_authenticated:
-    print(request.user.volunteer.pounds)
+    if not hasattr(request.user, "volunteer"):
+      volunteer = Volunteer(user=request.user, pounds=0)
+      volunteer.save()
     return request.user.volunteer.pounds 
   else:
     return "You must be logged in to donate!"
