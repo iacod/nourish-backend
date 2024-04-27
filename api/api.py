@@ -52,19 +52,28 @@ def log_in(request: HttpRequest, data: Login):
   else:
     return JsonResponse({"message": "Invalid username or password"}, status=406)
 
-@api.post("/donate/{amount}", auth=django_auth)
+@api.post("/donate/{amount}")
 def donate(request: HttpRequest, amount: int):
-  request.user.volunteer.pounds += amount
-  request.user.volunteer.save()
-  return JsonResponse({"amount_donated": amount}, status=200)
+  if request.user.is_authenticated():
+    request.user.volunteer.pounds += amount
+    request.user.volunteer.save()
+    return JsonResponse({"amount_donated": amount}, status=200)
+  else:
+    return JsonResponse({"message": "Not logged in"}, status=401)
 
-@api.get("/donate", auth=django_auth)
+@api.get("/donate")
 def get_donation_amount(request: HttpRequest):
-  if not hasattr(request.user, "volunteer"):
-    volunteer = Volunteer(user=request.user, pounds=0)
-    volunteer.save()
-  return JsonResponse({"amount_donated": request.user.volunteer.pounds}, status=200)
+  if request.user.is_authenticated():
+    if not hasattr(request.user, "volunteer"):
+      volunteer = Volunteer(user=request.user, pounds=0)
+      volunteer.save()
+    return JsonResponse({"amount_donated": request.user.volunteer.pounds}, status=200)
+  else:
+    return JsonResponse({"message": "Not logged in"}, status=401)
 
-@api.get("/user", auth=django_auth)
+@api.get("/user")
 def get_user(request: HttpRequest):
-  return JsonResponse(model_to_dict(request.user), status=200)
+  if request.user.is_authenticated():
+    return JsonResponse(model_to_dict(request.user), status=200)
+  else:
+    return JsonResponse({"message": "Not logged in"}, status=401)
