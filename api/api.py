@@ -35,14 +35,14 @@ def register(request: HttpRequest, data: Register):
   user.set_password(data.password)
   user.save()
 
-  return JsonResponse(data.model_dump_json(), status=200)
+  return JsonResponse(data.dict(), status=200)
 
 @api.post("/login")
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
     login(request, user)
-    return JsonResponse(data.model_dump_json(), status=200)
+    return JsonResponse(data.dict(), status=200)
   else:
     return JsonResponse({"message": "Invalid username or password"}, status=406)
 
