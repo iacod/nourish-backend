@@ -10,7 +10,7 @@
       "dest": "main/wsgi.py",
       "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
       "headers": {
-        "Access-Control-Allow-Origin": "https://e94f9ca7-1e56-4b55-a5b8-cde1b8d0f30e-00-9nxctsuoisic.worf.replit.dev"
+        "Access-Control-Allow-Origin": "*"
       }
     }
   ]
