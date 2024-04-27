@@ -1,6 +1,7 @@
+from pydantic.config import JsonDict
 from api.models import Volunteer
 from ninja import NinjaAPI, Schema
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 
@@ -22,7 +23,7 @@ def register(request: HttpRequest, data: Register):
   user = User.objects.filter(username=data.username, email=data.email)
 
   if user.exists():
-    return "User already exists!"
+    return JsonResponse({"User already exists"}, status=409)
 
   user = User.objects.create(
     username=data.username,
@@ -34,25 +35,25 @@ def register(request: HttpRequest, data: Register):
   user.set_password(data.password)
   user.save()
 
-  return data
+  return JsonResponse(data, status=200)
 
 @api.post("/login")
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
     login(request, user)
-    return data
+    return JsonResponse(data, status=200)
   else:
-    return "Invalid username or password!"
+    return JsonResponse({"Invalid username or password"}, status=406)
 
 @api.post("/donate/{amount}")
 def donate(request: HttpRequest, amount: int):
   if request.user.is_authenticated:
     request.user.volunteer.pounds += amount
     request.user.volunteer.save()
-    return request.user.volunteer.pounds 
+    return JsonResponse({amount}, status=200)
   else:
-    return "You must be logged in to donate!"
+    return JsonResponse({"You must be logged in"}, status=401)
 
 @api.get("/donate")
 def get_donation_amount(request: HttpRequest):
@@ -60,6 +61,6 @@ def get_donation_amount(request: HttpRequest):
     if not hasattr(request.user, "volunteer"):
       volunteer = Volunteer(user=request.user, pounds=0)
       volunteer.save()
-    return request.user.volunteer.pounds 
+    return JsonResponse({request.user.volunteer.pounds}, status=200)
   else:
-    return "You must be logged in to donate!"
+    return JsonResponse({"You must be logged in"}, status=401)
