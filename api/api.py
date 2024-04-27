@@ -45,7 +45,7 @@ def register(request: HttpRequest, data: Register):
 def log_in(request: HttpRequest, data: Login):
   user = authenticate(request, username=data.username, password=data.password)
   if user is not None:
-    user.is_active = True
+    user.is_active = False
     login(request, user)
     return JsonResponse(data.dict(), status=200)
   else:
