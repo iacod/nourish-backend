@@ -48,6 +48,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 SESSION_COOKIE_DOMAIN = "nourish-backend.vercel.app"
 SESSION_COOKIE_PATH = "/tmp"
+SESSION_COOKIE_AGE = 1209600 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
