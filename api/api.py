@@ -23,7 +23,7 @@ def register(request: HttpRequest, data: Register):
   user = User.objects.filter(username=data.username, email=data.email)
 
   if user.exists():
-    return JsonResponse({"User already exists"}, status=409)
+    return JsonResponse({"message": "User already exists"}, status=409)
 
   user = User.objects.create(
     username=data.username,
@@ -44,16 +44,16 @@ def log_in(request: HttpRequest, data: Login):
     login(request, user)
     return JsonResponse(data, status=200)
   else:
-    return JsonResponse({"Invalid username or password"}, status=406)
+    return JsonResponse({"message": "Invalid username or password"}, status=406)
 
 @api.post("/donate/{amount}")
 def donate(request: HttpRequest, amount: int):
   if request.user.is_authenticated:
     request.user.volunteer.pounds += amount
     request.user.volunteer.save()
-    return JsonResponse({amount}, status=200)
+    return JsonResponse({"amount_donated": amount}, status=200)
   else:
-    return JsonResponse({"You must be logged in"}, status=401)
+    return JsonResponse({"message": "You must be logged in"}, status=401)
 
 @api.get("/donate")
 def get_donation_amount(request: HttpRequest):
@@ -61,6 +61,6 @@ def get_donation_amount(request: HttpRequest):
     if not hasattr(request.user, "volunteer"):
       volunteer = Volunteer(user=request.user, pounds=0)
       volunteer.save()
-    return JsonResponse({request.user.volunteer.pounds}, status=200)
+    return JsonResponse({"amount_donated": request.user.volunteer.pounds}, status=200)
   else:
-    return JsonResponse({"You must be logged in"}, status=401)
+    return JsonResponse({"message": "You must be logged in"}, status=401)
