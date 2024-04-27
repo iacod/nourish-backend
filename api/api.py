@@ -54,7 +54,7 @@ def log_in(request: HttpRequest, data: Login):
 
 @api.post("/donate/{amount}")
 def donate(request: HttpRequest, amount: int):
-  if request.user.is_authenticated():
+  if request.user.is_authenticated:
     request.user.volunteer.pounds += amount
     request.user.volunteer.save()
     return JsonResponse({"amount_donated": amount}, status=200)
@@ -63,7 +63,7 @@ def donate(request: HttpRequest, amount: int):
 
 @api.get("/donate")
 def get_donation_amount(request: HttpRequest):
-  if request.user.is_authenticated():
+  if request.user.is_authenticated:
     if not hasattr(request.user, "volunteer"):
       volunteer = Volunteer(user=request.user, pounds=0)
       volunteer.save()
@@ -73,7 +73,7 @@ def get_donation_amount(request: HttpRequest):
 
 @api.get("/user")
 def get_user(request: HttpRequest):
-  if request.user.is_authenticated():
+  if request.user.is_authenticated:
     return JsonResponse(model_to_dict(request.user), status=200)
   else:
     return JsonResponse({"message": "Not logged in"}, status=401)
