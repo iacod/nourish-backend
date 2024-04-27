@@ -44,6 +44,11 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_COOKIE_DOMAIN = "nourish-backend.vercel.app"
+SESSION_COOKIE_PATH = "/tmp"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -136,6 +142,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-SESSION_COOKIE_NAME = 'session_id'
-
-SESSION_COOKIE_DOMAIN = 'nourish-backend.vercel.app'
