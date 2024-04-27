@@ -5,6 +5,7 @@ from django.http import HttpRequest, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from ninja.security import django_auth
+from django.forms.models import model_to_dict
 
 api = NinjaAPI(csrf=True)
 
@@ -62,4 +63,4 @@ def get_donation_amount(request: HttpRequest):
 
 @api.get("/user", auth=django_auth)
 def get_user(request: HttpRequest):
-  return JsonResponse(request.user.dict(), status=200)
+  return JsonResponse(model_to_dict(request.user), status=200)
