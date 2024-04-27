@@ -1,15 +1,4 @@
 {
-  "builds": [{
-      "src": "main/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb" }
-  }],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "main/wsgi.py"
-    }
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -20,5 +9,14 @@
         { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
       ]
     }
-  ]
+  ],
+  "builds": [{
+      "src": "main/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb" }
+  }],
+  "routes": [{
+      "src": "/(.*)",
+      "dest": "main/wsgi.py"
+  }],
 }
