@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from ninja.security import django_auth
 from django.forms.models import model_to_dict
 
-api = NinjaAPI(csrf=True)
+api = NinjaAPI()
 
 class Register(Schema):
   username: str
